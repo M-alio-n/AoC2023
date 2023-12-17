@@ -32,28 +32,29 @@ class CamelHand():
     
     def __iter__(self):
         self._curr_inds = [0 for i in self._inds]
+        if len(self._curr_inds) > 0:
+            self._curr_inds[-1] = -1
         self._tmp_hand = self.hand
         return self
     
     def __next__(self):
-        if len(self._curr_inds) == 0 or all(i==13 for i in self._curr_inds):
-            raise StopIteration
-        
-        return_hand = self._tmp_hand
         (self._tmp_hand, self._curr_inds) = increase_hand(
             self._tmp_hand, self._inds, self._curr_inds)
+        return_hand = self._tmp_hand
         return return_hand
 
 def increase_hand(hand, inds, curr_inds):
-    new_curr_inds = increase_inds(curr_inds, -1)
+    new_curr_inds = increase_inds(curr_inds, len(curr_inds)-1)
     new_hand = hand
     for idx, char_idx in enumerate(inds):
         new_hand = new_hand[0:char_idx] + card_order[curr_inds[idx]] + new_hand[char_idx+1::]
     return (new_hand, new_curr_inds)
 
 def increase_inds(inds, pos):
+    if len(inds) == 0 or all(i==12 for i in inds):
+        raise StopIteration
     inds[pos] += 1
-    if inds[pos] == 14:
+    if inds[pos] == 13:
         inds[pos] = 0
         increase_inds(inds, pos-1)
     return inds
@@ -90,7 +91,6 @@ print(sum(hand.bid*(rank+1) for rank,hand in enumerate(hands)))
 
 ### Part 2
 card_order.insert(0, card_order.pop(9))
-card_order.append('J')
 for hand in hands:
     hand.set_max_type()
 hands.sort()

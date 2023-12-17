@@ -38,6 +38,8 @@ class CamelHand():
         return self
     
     def __next__(self):
+        if len(self._curr_inds) == 0 or all(i==12 for i in self._curr_inds):
+            raise StopIteration
         (self._tmp_hand, self._curr_inds) = increase_hand(
             self._tmp_hand, self._inds, self._curr_inds)
         return_hand = self._tmp_hand
@@ -51,8 +53,6 @@ def increase_hand(hand, inds, curr_inds):
     return (new_hand, new_curr_inds)
 
 def increase_inds(inds, pos):
-    if len(inds) == 0 or all(i==12 for i in inds):
-        raise StopIteration
     inds[pos] += 1
     if inds[pos] == 13:
         inds[pos] = 0
